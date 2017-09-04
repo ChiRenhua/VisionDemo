@@ -8,13 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		7188F0691F5AB27A00795E59 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188F0681F5AB27A00795E59 /* AppDelegate.m */; };
-		7188F06C1F5AB27A00795E59 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188F06B1F5AB27A00795E59 /* ViewController.m */; };
-		7188F06F1F5AB27A00795E59 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7188F06D1F5AB27A00795E59 /* Main.storyboard */; };
 		7188F0711F5AB27A00795E59 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7188F0701F5AB27A00795E59 /* Assets.xcassets */; };
-		7188F0741F5AB27A00795E59 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7188F0721F5AB27A00795E59 /* LaunchScreen.storyboard */; };
 		7188F0771F5AB27A00795E59 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188F0761F5AB27A00795E59 /* main.m */; };
 		7188F0811F5AB27A00795E59 /* VisionDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188F0801F5AB27A00795E59 /* VisionDemoTests.m */; };
 		7188F08C1F5AB27A00795E59 /* VisionDemoUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188F08B1F5AB27A00795E59 /* VisionDemoUITests.m */; };
+		71EA92281F5AB46B001DF848 /* test.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 7188F0A11F5AB2C400795E59 /* test.mp4 */; };
+		71EA92291F5AB477001DF848 /* VisionCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188F09B1F5AB2C400795E59 /* VisionCameraViewController.m */; };
+		71EA922A1F5AB477001DF848 /* VisionMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188F09D1F5AB2C400795E59 /* VisionMainViewController.m */; };
+		71EA922B1F5AB477001DF848 /* VisionVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188F09F1F5AB2C400795E59 /* VisionVideoViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,11 +39,7 @@
 		7188F0641F5AB27A00795E59 /* VisionDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VisionDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7188F0671F5AB27A00795E59 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		7188F0681F5AB27A00795E59 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		7188F06A1F5AB27A00795E59 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		7188F06B1F5AB27A00795E59 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		7188F06E1F5AB27A00795E59 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		7188F0701F5AB27A00795E59 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		7188F0731F5AB27A00795E59 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7188F0751F5AB27A00795E59 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7188F0761F5AB27A00795E59 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		7188F07C1F5AB27A00795E59 /* VisionDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VisionDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -51,6 +48,13 @@
 		7188F0871F5AB27A00795E59 /* VisionDemoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VisionDemoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7188F08B1F5AB27A00795E59 /* VisionDemoUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VisionDemoUITests.m; sourceTree = "<group>"; };
 		7188F08D1F5AB27A00795E59 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7188F09A1F5AB2C400795E59 /* VisionCameraViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VisionCameraViewController.h; sourceTree = "<group>"; };
+		7188F09B1F5AB2C400795E59 /* VisionCameraViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VisionCameraViewController.m; sourceTree = "<group>"; };
+		7188F09C1F5AB2C400795E59 /* VisionMainViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VisionMainViewController.h; sourceTree = "<group>"; };
+		7188F09D1F5AB2C400795E59 /* VisionMainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VisionMainViewController.m; sourceTree = "<group>"; };
+		7188F09E1F5AB2C400795E59 /* VisionVideoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VisionVideoViewController.h; sourceTree = "<group>"; };
+		7188F09F1F5AB2C400795E59 /* VisionVideoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VisionVideoViewController.m; sourceTree = "<group>"; };
+		7188F0A11F5AB2C400795E59 /* test.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = test.mp4; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,13 +105,11 @@
 		7188F0661F5AB27A00795E59 /* VisionDemo */ = {
 			isa = PBXGroup;
 			children = (
+				7188F0991F5AB2C400795E59 /* Controller */,
+				7188F0A01F5AB2C400795E59 /* Resource */,
 				7188F0671F5AB27A00795E59 /* AppDelegate.h */,
 				7188F0681F5AB27A00795E59 /* AppDelegate.m */,
-				7188F06A1F5AB27A00795E59 /* ViewController.h */,
-				7188F06B1F5AB27A00795E59 /* ViewController.m */,
-				7188F06D1F5AB27A00795E59 /* Main.storyboard */,
 				7188F0701F5AB27A00795E59 /* Assets.xcassets */,
-				7188F0721F5AB27A00795E59 /* LaunchScreen.storyboard */,
 				7188F0751F5AB27A00795E59 /* Info.plist */,
 				7188F0761F5AB27A00795E59 /* main.m */,
 			);
@@ -130,6 +132,27 @@
 				7188F08D1F5AB27A00795E59 /* Info.plist */,
 			);
 			path = VisionDemoUITests;
+			sourceTree = "<group>";
+		};
+		7188F0991F5AB2C400795E59 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				7188F09A1F5AB2C400795E59 /* VisionCameraViewController.h */,
+				7188F09B1F5AB2C400795E59 /* VisionCameraViewController.m */,
+				7188F09C1F5AB2C400795E59 /* VisionMainViewController.h */,
+				7188F09D1F5AB2C400795E59 /* VisionMainViewController.m */,
+				7188F09E1F5AB2C400795E59 /* VisionVideoViewController.h */,
+				7188F09F1F5AB2C400795E59 /* VisionVideoViewController.m */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		7188F0A01F5AB2C400795E59 /* Resource */ = {
+			isa = PBXGroup;
+			children = (
+				7188F0A11F5AB2C400795E59 /* test.mp4 */,
+			);
+			path = Resource;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -235,9 +258,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7188F0741F5AB27A00795E59 /* LaunchScreen.storyboard in Resources */,
+				71EA92281F5AB46B001DF848 /* test.mp4 in Resources */,
 				7188F0711F5AB27A00795E59 /* Assets.xcassets in Resources */,
-				7188F06F1F5AB27A00795E59 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,7 +284,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7188F06C1F5AB27A00795E59 /* ViewController.m in Sources */,
+				71EA92291F5AB477001DF848 /* VisionCameraViewController.m in Sources */,
+				71EA922A1F5AB477001DF848 /* VisionMainViewController.m in Sources */,
+				71EA922B1F5AB477001DF848 /* VisionVideoViewController.m in Sources */,
 				7188F0771F5AB27A00795E59 /* main.m in Sources */,
 				7188F0691F5AB27A00795E59 /* AppDelegate.m in Sources */,
 			);
@@ -298,25 +322,6 @@
 			targetProxy = 7188F0881F5AB27A00795E59 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		7188F06D1F5AB27A00795E59 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				7188F06E1F5AB27A00795E59 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		7188F0721F5AB27A00795E59 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				7188F0731F5AB27A00795E59 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		7188F08E1F5AB27A00795E59 /* Debug */ = {
@@ -426,7 +431,7 @@
 				DEVELOPMENT_TEAM = V5QYPYR594;
 				INFOPLIST_FILE = VisionDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = RenhuaChi.VisionDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = renhuachi.CoreML;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -439,7 +444,7 @@
 				DEVELOPMENT_TEAM = V5QYPYR594;
 				INFOPLIST_FILE = VisionDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = RenhuaChi.VisionDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = renhuachi.CoreML;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -518,6 +523,7 @@
 				7188F0921F5AB27A00795E59 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		7188F0931F5AB27A00795E59 /* Build configuration list for PBXNativeTarget "VisionDemoTests" */ = {
 			isa = XCConfigurationList;
@@ -526,6 +532,7 @@
 				7188F0951F5AB27A00795E59 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		7188F0961F5AB27A00795E59 /* Build configuration list for PBXNativeTarget "VisionDemoUITests" */ = {
 			isa = XCConfigurationList;
@@ -534,6 +541,7 @@
 				7188F0981F5AB27A00795E59 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
