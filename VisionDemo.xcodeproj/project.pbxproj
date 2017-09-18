@@ -12,10 +12,11 @@
 		7188F0771F5AB27A00795E59 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188F0761F5AB27A00795E59 /* main.m */; };
 		7188F0811F5AB27A00795E59 /* VisionDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188F0801F5AB27A00795E59 /* VisionDemoTests.m */; };
 		7188F08C1F5AB27A00795E59 /* VisionDemoUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188F08B1F5AB27A00795E59 /* VisionDemoUITests.m */; };
-		71EA92281F5AB46B001DF848 /* test.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 7188F0A11F5AB2C400795E59 /* test.mp4 */; };
+		71E248D61F6D270D00656264 /* test.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 71E248D41F6D26AA00656264 /* test.mp4 */; };
 		71EA92291F5AB477001DF848 /* VisionCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188F09B1F5AB2C400795E59 /* VisionCameraViewController.m */; };
 		71EA922A1F5AB477001DF848 /* VisionMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188F09D1F5AB2C400795E59 /* VisionMainViewController.m */; };
 		71EA922B1F5AB477001DF848 /* VisionVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188F09F1F5AB2C400795E59 /* VisionVideoViewController.m */; };
+		71F3334E1F70136C00B46BAD /* video1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 716DB31E1F7011EC005CC8BC /* video1.mp4 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +37,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		716DB31E1F7011EC005CC8BC /* video1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = video1.mp4; sourceTree = "<group>"; };
 		7188F0641F5AB27A00795E59 /* VisionDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VisionDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7188F0671F5AB27A00795E59 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		7188F0681F5AB27A00795E59 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -54,7 +56,7 @@
 		7188F09D1F5AB2C400795E59 /* VisionMainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VisionMainViewController.m; sourceTree = "<group>"; };
 		7188F09E1F5AB2C400795E59 /* VisionVideoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VisionVideoViewController.h; sourceTree = "<group>"; };
 		7188F09F1F5AB2C400795E59 /* VisionVideoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VisionVideoViewController.m; sourceTree = "<group>"; };
-		7188F0A11F5AB2C400795E59 /* test.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = test.mp4; sourceTree = "<group>"; };
+		71E248D41F6D26AA00656264 /* test.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = test.mp4; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,7 +152,8 @@
 		7188F0A01F5AB2C400795E59 /* Resource */ = {
 			isa = PBXGroup;
 			children = (
-				7188F0A11F5AB2C400795E59 /* test.mp4 */,
+				716DB31E1F7011EC005CC8BC /* video1.mp4 */,
+				71E248D41F6D26AA00656264 /* test.mp4 */,
 			);
 			path = Resource;
 			sourceTree = "<group>";
@@ -258,7 +261,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71EA92281F5AB46B001DF848 /* test.mp4 in Resources */,
+				71F3334E1F70136C00B46BAD /* video1.mp4 in Resources */,
+				71E248D61F6D270D00656264 /* test.mp4 in Resources */,
 				7188F0711F5AB27A00795E59 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -431,7 +435,7 @@
 				DEVELOPMENT_TEAM = V5QYPYR594;
 				INFOPLIST_FILE = VisionDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = renhuachi.CoreML;
+				PRODUCT_BUNDLE_IDENTIFIER = renhuachi.VisionDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -444,7 +448,7 @@
 				DEVELOPMENT_TEAM = V5QYPYR594;
 				INFOPLIST_FILE = VisionDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = renhuachi.CoreML;
+				PRODUCT_BUNDLE_IDENTIFIER = renhuachi.VisionDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
