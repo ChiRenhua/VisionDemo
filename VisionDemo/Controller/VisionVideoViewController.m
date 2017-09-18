@@ -238,27 +238,18 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
     NSString *tempPath = [NSTemporaryDirectory() stringByAppendingPathComponent:
                           [NSString stringWithFormat:@"temp.mp4"]];
     [[NSFileManager defaultManager] removeItemAtPath:tempPath error:NULL];
-    //    NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
-    //    NSString *moviePath =[[paths objectAtIndex:0]stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mov",@"test"]];
-    //    self.theVideoPath=moviePath;
     
     //定义视频的大小320 480 倍数
     CGSize size =CGSizeMake(1280,720);
     
-    //        [selfwriteImages:imageArr ToMovieAtPath:moviePath withSize:sizeinDuration:4 byFPS:30];//第2中方法
-    
     NSError *error =nil;
-    //    转成UTF-8编码
-    //    unlink([moviePath UTF8String]);
-    //    NSLog(@"path->%@",moviePath);
-    //     iphone提供了AVFoundation库来方便的操作多媒体设备，AVAssetWriter这个类可以方便的将图像和音频写成一个完整的视频文件
     AVAssetWriter *videoWriter = [[AVAssetWriter alloc] initWithURL:[NSURL fileURLWithPath:tempPath] fileType:AVFileTypeQuickTimeMovie error:&error];
     
     NSParameterAssert(videoWriter);
     if(error)
         NSLog(@"error =%@", [error localizedDescription]);
     //mov的格式设置 编码格式 宽度 高度
-    NSDictionary *videoSettings =[NSDictionary dictionaryWithObjectsAndKeys:AVVideoCodecH264,AVVideoCodecKey,
+    NSDictionary *videoSettings =[NSDictionary dictionaryWithObjectsAndKeys:AVVideoCodecTypeH264,AVVideoCodecKey,
                                   [NSNumber numberWithInt:size.width],AVVideoWidthKey,
                                   [NSNumber numberWithInt:size.height],AVVideoHeightKey,nil];
     
