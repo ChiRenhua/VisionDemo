@@ -18,8 +18,15 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
 @property (nonatomic, strong) AVPlayerItem *playerItem;
 @property (nonatomic, strong) AVPlayerItemVideoOutput *videoOutput;
 @property (nonatomic, strong) NSMutableArray *hats;
-@property (nonatomic, strong) CADisplayLink *displayLink;
-@property (nonatomic, strong) __block NSMutableArray *imageArr;
+@property (nonatomic, strong) NSMutableArray *videoImages;
+@property (nonatomic, strong) NSMutableDictionary *videoImagesDic;
+@property (nonatomic, strong) NSMutableDictionary *resultsDic;
+@property (nonatomic, strong) NSTimer *timer;
+
+// UI
+@property (nonatomic, strong) UIButton *saveButton;
+@property (nonatomic, strong) UILabel *progressLabel;
+@property (nonatomic, strong) UIProgressView *progressView;
 
 @end
 
@@ -30,6 +37,8 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
     self.view.backgroundColor = [UIColor whiteColor];
     self.hats = [[NSMutableArray alloc] init];
     self.videoOutput = [[AVPlayerItemVideoOutput alloc] init];
+    self.videoImagesDic = [[NSMutableDictionary alloc] init];
+    self.resultsDic = [[NSMutableDictionary alloc] init];
     
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"video1" ofType:@"mp4"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
@@ -45,31 +54,55 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
     playerlayer.videoGravity = AVLayerVideoGravityResizeAspect;
     [self.view.layer addSublayer:playerlayer];
     
+    // Button
+    self.saveButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    self.saveButton.frame = CGRectMake((self.view.bounds.size.width - 100) / 2, 350, 100, 50);
+    [self.saveButton setTitle:@"保存" forState: UIControlStateNormal];
+    [self.saveButton setTintColor:[UIColor blackColor]];
+    [self.saveButton setHidden:YES];
+    self.saveButton.titleLabel.font = [UIFont systemFontOfSize:23];
+    [self.saveButton addTarget:self action:@selector(saveVideo) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:self.saveButton];
+    
+    // ProgressLabel
+    self.progressLabel = [[UILabel alloc] initWithFrame:CGRectMake((self.view.bounds.size.width - 200) / 2, 450, 200, 50)];
+    self.progressLabel.font = [UIFont systemFontOfSize:50];
+    self.progressLabel.textAlignment = NSTextAlignmentCenter;
+    [self.view addSubview:self.progressLabel];
+    
+    // ProgressView
+    self.progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
+    self.progressView.frame = CGRectMake(10, 520, self.view.bounds.size.width - 20, 50);
+    [self.progressView setHidden:YES];
+    [self.view addSubview:self.progressView];
+    
     [self splitVideo:url fps:20 splitCompleteBlock:^(BOOL success, NSMutableArray *splitimgs) {
-        self.imageArr = splitimgs;
-        
-        if (success) {
-            NSArray *arr = [self.imageArr copy];
-                [arr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                    [self handelImageWithImage:obj index:idx];
-                }];
-                [self testCompressionSession];
-            
-        }
-        
-        NSLog(@"");
+        self.videoImages = splitimgs;
     }];
     
 }
+
+- (void)saveVideo {
+    [self.progressView setHidden:NO];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [self.videoImages enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            [self handelImageWithImage:obj index:idx];
+        }];
+        
+        [self testCompressionSession];
+    });
+}
+
 //监听回调
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
     AVPlayerItem *playerItem = (AVPlayerItem *)object;
     
     if ([keyPath isEqualToString:@"status"]) {
         if (playerItem.status == AVPlayerItemStatusReadyToPlay){
-                        [self.player play];
-                        self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(refreshImage)];
-                        [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+//            [self.player play];
+//            self.timer = [NSTimer timerWithTimeInterval:0.1 target:self selector:@selector(refreshImage) userInfo:nil repeats:YES];
+//            [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSDefaultRunLoopMode];
         }
     }
 }
@@ -119,6 +152,7 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
             
         }];
     });
+    
 }
 
 - (void)splitVideo:(NSURL *)fileUrl fps:(float)fps splitCompleteBlock:(SplitCompleteBlock)splitCompleteBlock {
@@ -162,6 +196,8 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
                 UIImage *frameImg = [UIImage imageWithCGImage:image];
                 [splitImages addObject:frameImg];
                 
+                [self preHandelImage:frameImg];
+                
                 if (requestedTime.value == timesCount) {
                     isSuccess = YES;
                     NSLog(@"completed");
@@ -169,6 +205,10 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
                     if (splitCompleteBlock) {
                         splitCompleteBlock(isSuccess,splitImages);
                     }
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self.saveButton setHidden:NO];
+                    });
                 }
             }
                 break;
@@ -176,79 +216,83 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
     }];
 }
 
-- (void)handelImageWithImage:(UIImage *)image index:(NSUInteger)indexpath {
+- (void)preHandelImage:(UIImage *)image {
     NSError *error;
-    __block BOOL shouldReplace = NO;
-    __block CGImageRef imageRef = image.CGImage;
-    __block VNDetectFaceRectanglesRequest *faceRequest = [[VNDetectFaceRectanglesRequest alloc] init];
-    __block VNImageRequestHandler *requestHandler = [[VNImageRequestHandler alloc] initWithCGImage:imageRef options:@{}];
+    CGImageRef imageRef = image.CGImage;
+    VNDetectFaceRectanglesRequest *faceRequest = [[VNDetectFaceRectanglesRequest alloc] init];
+    VNImageRequestHandler *requestHandler = [[VNImageRequestHandler alloc] initWithCGImage:imageRef options:@{}];
     [requestHandler performRequests:@[faceRequest] error:&error];
     
-    NSArray *results = faceRequest.results;
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        
-        __block UIImage *handelImage = image;
-        
-        [results enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            shouldReplace = YES;
-            VNFaceObservation *observation = (VNFaceObservation *)obj;
-            CGRect oldRect = observation.boundingBox;
-            CGFloat w = oldRect.size.width * image.size.width;
-            CGFloat h = oldRect.size.height * image.size.height;
-            CGFloat x = oldRect.origin.x * image.size.width;
-            CGFloat y = image.size.height - (oldRect.origin.y * image.size.height) - h;
-            
-            // 添加帽子
-            CGRect rect = CGRectMake(x, y, w, h);
-            CGFloat hatWidth = w;
-            CGFloat hatHeight = h;
-            CGFloat hatX = rect.origin.x - hatWidth / 4 + 3;
-            CGFloat hatY = rect.origin.y -  hatHeight - 5;
-            CGRect hatRect = CGRectMake(hatX, hatY, hatWidth, hatHeight);
-            
-            UIImage *image = [UIImage imageNamed:@"hat"];
-            
-            handelImage = [self addImage:image rect:hatRect toImage:handelImage];
-            
-        }];
-        
-        if (shouldReplace) {
-            [self.imageArr replaceObjectAtIndex:indexpath withObject:handelImage];
-        }
-        
-        NSLog(@"Done");
-    });
+    if (faceRequest.results.count) {
+        [self.videoImagesDic setValue:@(1) forKey:image.description];
+        [self.resultsDic setValue:faceRequest.results forKey:image.description];
+    } else {
+        [self.videoImagesDic setValue:@(0) forKey:image.description];
+    }
 }
 
-
-
-
-
-
-
-
-
-
-
+- (void)handelImageWithImage:(UIImage *)image index:(NSUInteger)indexpath {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.progressView.progress = 0.9 * ((float)indexpath / (float)self.videoImages.count);
+        self.progressLabel.text = [NSString stringWithFormat:@"%d %@", (int)(90 * ((float)indexpath / (float)self.videoImages.count)), @"%"];
+    });
+    
+    BOOL hasFace = [[self.videoImagesDic valueForKey:image.description] boolValue];
+    
+    if (!hasFace) {
+        NSLog(@"没脸见人啦");
+        return;
+    }
+    
+    NSArray *results = [self.resultsDic valueForKey:image.description];
+    
+    if (!results.count) {
+        return;
+    }
+    
+    __block UIImage *handelImage = image;
+    __block UIImage *hatImage = [UIImage imageNamed:@"hat"];
+    [results enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        VNFaceObservation *observation = (VNFaceObservation *)obj;
+        CGRect oldRect = observation.boundingBox;
+        CGFloat w = oldRect.size.width * image.size.width;
+        CGFloat h = oldRect.size.height * image.size.height;
+        CGFloat x = oldRect.origin.x * image.size.width;
+        CGFloat y = image.size.height - (oldRect.origin.y * image.size.height) - h;
+        
+        // 添加帽子
+        CGRect rect = CGRectMake(x, y, w, h);
+        CGFloat hatWidth = w;
+        CGFloat hatHeight = h;
+        CGFloat hatX = rect.origin.x - hatWidth / 4 + 3;
+        CGFloat hatY = rect.origin.y -  hatHeight - 5;
+        CGRect hatRect = CGRectMake(hatX, hatY, hatWidth, hatHeight);
+        
+        handelImage = [self addImage:hatImage rect:hatRect toImage:handelImage];
+        
+    }];
+    
+    [self.videoImages replaceObjectAtIndex:indexpath withObject:handelImage];
+    
+    NSLog(@"Done");
+}
 
 -(void)testCompressionSession
 {
-    //设置mov路径
     NSString *tempPath = [NSTemporaryDirectory() stringByAppendingPathComponent:
                           [NSString stringWithFormat:@"temp.mp4"]];
     [[NSFileManager defaultManager] removeItemAtPath:tempPath error:NULL];
     
     //定义视频的大小320 480 倍数
-    CGSize size =CGSizeMake(1280,720);
+    CGSize size = CGSizeMake(1280,720);
     
-    NSError *error =nil;
-    AVAssetWriter *videoWriter = [[AVAssetWriter alloc] initWithURL:[NSURL fileURLWithPath:tempPath] fileType:AVFileTypeQuickTimeMovie error:&error];
+    NSError *error = nil;
+    AVAssetWriter *videoWriter = [[AVAssetWriter alloc] initWithURL:[NSURL fileURLWithPath:tempPath] fileType:AVFileTypeMPEG4 error:&error];
     
     NSParameterAssert(videoWriter);
     if(error)
         NSLog(@"error =%@", [error localizedDescription]);
-    //mov的格式设置 编码格式 宽度 高度
+    //格式设置 编码格式 宽度 高度
     NSDictionary *videoSettings =[NSDictionary dictionaryWithObjectsAndKeys:AVVideoCodecTypeH264,AVVideoCodecKey,
                                   [NSNumber numberWithInt:size.width],AVVideoWidthKey,
                                   [NSNumber numberWithInt:size.height],AVVideoHeightKey,nil];
@@ -264,14 +308,14 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
     NSParameterAssert(writerInput);
     NSParameterAssert([videoWriter canAddInput:writerInput]);
     
-    if ([videoWriter canAddInput:writerInput])
-    {
-        NSLog(@"11111");
-    }
-    else
-    {
-        NSLog(@"22222");
-    }
+    //    if ([videoWriter canAddInput:writerInput])
+    //    {
+    //        NSLog(@"11111");
+    //    }
+    //    else
+    //    {
+    //        NSLog(@"22222");
+    //    }
     
     [videoWriter addInput:writerInput];
     
@@ -280,40 +324,53 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
     
     //合成多张图片为一个视频文件
     dispatch_queue_t dispatchQueue =dispatch_queue_create("mediaInputQueue",NULL);
-    int __block frame =0;
+    int __block frame = 0;
+    
     [writerInput requestMediaDataWhenReadyOnQueue:dispatchQueue usingBlock:^{
         
         while([writerInput isReadyForMoreMediaData])
         {
-            if(++frame >=[self.imageArr count]*10)
+            if(++ frame >= [self.videoImages count])
             {
                 [writerInput markAsFinished];
-                [videoWriter finishWriting];
-                //              [videoWriterfinishWritingWithCompletionHandler:nil];
+                [videoWriter finishWritingWithCompletionHandler:^{
+                    
+                }];
                 break;
             }
-            CVPixelBufferRef buffer =NULL;
-            int idx =frame/10;
+            CVPixelBufferRef buffer = NULL;
+            int idx = frame;
             NSLog(@"idx==%d",idx);
-            buffer = (CVPixelBufferRef)[self pixelBufferFromCGImage:[[self.imageArr objectAtIndex:idx] CGImage] size:size];
+            buffer = (CVPixelBufferRef)[self pixelBufferFromCGImage:[[self.videoImages objectAtIndex:idx] CGImage] size:size];
             
             if (buffer)
             {
-                if(![adaptor appendPixelBuffer:buffer withPresentationTime:CMTimeMake(frame,150)])//设置每秒钟播放图片的个数
+                if(![adaptor appendPixelBuffer:buffer withPresentationTime:CMTimeMake(frame,20)])//设置每秒钟播放图片的个数
                 {
                     NSLog(@"FAIL");
                 }
                 else
                 {
                     NSLog(@"OK");
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        self.progressView.progress = 0.9 + (0.1 * ((float)idx / (float)self.videoImages.count));
+                        self.progressLabel.text = [NSString stringWithFormat:@"%d %@", (int)(90 + (10 * ((float)idx / (float)self.videoImages.count))), @"%"];
+                    });
                 }
                 
-                CFRelease(buffer);
+                CVPixelBufferRelease(buffer);
             }
         }
-        UISaveVideoAtPathToSavedPhotosAlbum(tempPath, self, nil, nil);
+        UISaveVideoAtPathToSavedPhotosAlbum(tempPath, self, @selector(doneSaveForvideo:didFinishSavingWithError:contextInfo:), nil);
     }];
-    
+}
+
+- (void)doneSaveForvideo:(NSString *)videoPath didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.progressView.progress > 0.99) {
+            self.progressLabel.text = @"已完成";
+        }
+    });
 }
 
 - (CVPixelBufferRef)pixelBufferFromCGImage:(CGImageRef)image size:(CGSize)size
@@ -351,22 +408,22 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
 
 
 - (UIImage *)addImage:(UIImage *)image1 rect:(CGRect)rect toImage:(UIImage *)image2 {
-    UIGraphicsBeginImageContext(image2.size);
-    
-    [image2 drawInRect:CGRectMake(0, 0, image2.size.width, image2.size.height)];
-    [image1 drawInRect:rect];
-    
-    UIImage *resultingImage = UIGraphicsGetImageFromCurrentImageContext();
-    
-    UIGraphicsEndImageContext();
-    
-    return resultingImage;
+    @autoreleasepool {
+        UIGraphicsBeginImageContext(image2.size);
+        
+        [image2 drawInRect:CGRectMake(0, 0, image2.size.width, image2.size.height)];
+        [image1 drawInRect:rect];
+        
+        UIImage *resultingImage = UIGraphicsGetImageFromCurrentImageContext();
+        
+        UIGraphicsEndImageContext();
+        return resultingImage;
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [self.player pause];
-    [self.displayLink invalidate];
-    self.displayLink = nil;
+    [self.timer invalidate];
 }
 
 - (void)dealloc {
