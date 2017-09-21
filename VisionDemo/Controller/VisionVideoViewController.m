@@ -17,6 +17,7 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
 @property (nonatomic, strong) AVPlayer *player;
 @property (nonatomic, strong) AVPlayerItem *playerItem;
 @property (nonatomic, strong) AVPlayerItemVideoOutput *videoOutput;
+@property (nonatomic, strong) AVAssetTrack *track;
 @property (nonatomic, strong) NSMutableArray *hats;
 @property (nonatomic, strong) NSMutableArray *videoImages;
 @property (nonatomic, strong) NSMutableDictionary *videoImagesDic;
@@ -27,6 +28,8 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
 @property (nonatomic, strong) UIButton *saveButton;
 @property (nonatomic, strong) UILabel *progressLabel;
 @property (nonatomic, strong) UIProgressView *progressView;
+
+@property (nonatomic, strong) AVAssetImageGenerator *imgGenerator;
 
 @end
 
@@ -40,7 +43,7 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
     self.videoImagesDic = [[NSMutableDictionary alloc] init];
     self.resultsDic = [[NSMutableDictionary alloc] init];
     
-    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"video1" ofType:@"mp4"];
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"testVideo" ofType:@"mp4"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
     AVAsset *movieAsset = [AVURLAsset URLAssetWithURL:url options:nil];
     self.playerItem = [AVPlayerItem playerItemWithAsset:movieAsset];
@@ -53,6 +56,9 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
     playerlayer.frame = CGRectMake(10, 100, self.view.bounds.size.width - 20, 200);
     playerlayer.videoGravity = AVLayerVideoGravityResizeAspect;
     [self.view.layer addSublayer:playerlayer];
+    
+    // Take out audio
+    self.track = [[movieAsset tracksWithMediaType:AVMediaTypeAudio] firstObject];  //从媒体中得到声音轨道
     
     // Button
     self.saveButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
@@ -80,6 +86,8 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
         self.videoImages = splitimgs;
     }];
     
+    [self addNotification];
+    
 }
 
 - (void)saveVideo {
@@ -100,9 +108,9 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
     
     if ([keyPath isEqualToString:@"status"]) {
         if (playerItem.status == AVPlayerItemStatusReadyToPlay){
-//            [self.player play];
-//            self.timer = [NSTimer timerWithTimeInterval:0.1 target:self selector:@selector(refreshImage) userInfo:nil repeats:YES];
-//            [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSDefaultRunLoopMode];
+            [self.player play];
+            self.timer = [NSTimer timerWithTimeInterval:0.01 target:self selector:@selector(refreshImage) userInfo:nil repeats:YES];
+            [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSDefaultRunLoopMode];
         }
     }
 }
@@ -175,13 +183,13 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
         [times addObject:timeValue];
     }
     
-    AVAssetImageGenerator *imgGenerator = [[AVAssetImageGenerator alloc] initWithAsset:avasset];
+    self.imgGenerator = [[AVAssetImageGenerator alloc] initWithAsset:avasset];
     //防止时间出现偏差
-    imgGenerator.requestedTimeToleranceBefore = kCMTimeZero;
-    imgGenerator.requestedTimeToleranceAfter = kCMTimeZero;
+    self.imgGenerator.requestedTimeToleranceBefore = kCMTimeZero;
+    self.imgGenerator.requestedTimeToleranceAfter = kCMTimeZero;
     
     NSInteger timesCount = [times count];
-    [imgGenerator generateCGImagesAsynchronouslyForTimes:times completionHandler:^(CMTime requestedTime, CGImageRef  _Nullable image, CMTime actualTime, AVAssetImageGeneratorResult result, NSError * _Nullable error) {
+    [self.imgGenerator generateCGImagesAsynchronouslyForTimes:times completionHandler:^(CMTime requestedTime, CGImageRef  _Nullable image, CMTime actualTime, AVAssetImageGeneratorResult result, NSError * _Nullable error) {
         NSLog(@"current-----: %lld\n", requestedTime.value);
         //        NSLog(@"timeScale----: %d\n",requestedTime.timescale);
         BOOL isSuccess = NO;
@@ -353,23 +361,27 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
                 {
                     NSLog(@"OK");
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        self.progressView.progress = 0.9 + (0.1 * ((float)idx / (float)self.videoImages.count));
-                        self.progressLabel.text = [NSString stringWithFormat:@"%d %@", (int)(90 + (10 * ((float)idx / (float)self.videoImages.count))), @"%"];
+                        self.progressView.progress = 0.9 + (0.1 * ((float)idx / (float)(self.videoImages.count - 1)));
+                        self.progressLabel.text = [NSString stringWithFormat:@"%d %@", (int)(90 + (10 * ((float)idx / (float)(self.videoImages.count - 1)))), @"%"];
+                        
+                        if (idx == self.videoImages.count - 1) {
+                            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                                [self mixVideoWithAudioTrack:self.track VideoPath:tempPath];
+                            });
+                            
+                        }
                     });
                 }
                 
                 CVPixelBufferRelease(buffer);
             }
         }
-        UISaveVideoAtPathToSavedPhotosAlbum(tempPath, self, @selector(doneSaveForvideo:didFinishSavingWithError:contextInfo:), nil);
     }];
 }
 
 - (void)doneSaveForvideo:(NSString *)videoPath didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.progressView.progress > 0.99) {
-            self.progressLabel.text = @"已完成";
-        }
+        self.progressLabel.text = @"已完成";
     });
 }
 
@@ -405,7 +417,50 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
     return pxbuffer;
 }
 
-
+- (void)mixVideoWithAudioTrack:(AVAssetTrack *)audioAssetTrack VideoPath:(NSString *)videoPath {
+    // 最终合成输出路径
+    NSString *outPutFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:
+                          [NSString stringWithFormat:@"merge.mp4"]];
+    [[NSFileManager defaultManager] removeItemAtPath:outPutFilePath error:NULL];
+    // 添加合成路径
+    NSURL *outputFileUrl = [NSURL fileURLWithPath:outPutFilePath];
+    // 时间起点
+    CMTime nextClistartTime = kCMTimeZero;
+    // 创建可变的音视频组合
+    AVMutableComposition *comosition = [AVMutableComposition composition];
+    
+    // 视频采集
+    AVURLAsset *videoAsset = [AVURLAsset URLAssetWithURL:[NSURL fileURLWithPath:videoPath] options:nil];
+    // 视频时间范围
+    CMTimeRange videoTimeRange = CMTimeRangeMake(kCMTimeZero, videoAsset.duration);
+    // 视频通道 枚举 kCMPersistentTrackID_Invalid = 0
+    AVMutableCompositionTrack *videoTrack = [comosition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+    // 视频采集通道
+    AVAssetTrack *videoAssetTrack = [[videoAsset tracksWithMediaType:AVMediaTypeVideo] firstObject];
+    //  把采集轨道数据加入到可变轨道之中
+    [videoTrack insertTimeRange:videoTimeRange ofTrack:videoAssetTrack atTime:nextClistartTime error:nil];
+    
+    
+    // 因为视频短这里就直接用视频长度了,如果自动化需要自己写判断
+    CMTimeRange audioTimeRange = videoTimeRange;
+    // 音频通道
+    AVMutableCompositionTrack *audioTrack = [comosition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+    // 加入合成轨道之中
+    [audioTrack insertTimeRange:audioTimeRange ofTrack:audioAssetTrack atTime:nextClistartTime error:nil];
+    
+    // 创建一个输出
+    AVAssetExportSession *assetExport = [[AVAssetExportSession alloc] initWithAsset:comosition presetName:AVAssetExportPresetMediumQuality];
+    // 输出类型
+    assetExport.outputFileType = AVFileTypeQuickTimeMovie;
+    // 输出地址
+    assetExport.outputURL = outputFileUrl;
+    // 优化
+    assetExport.shouldOptimizeForNetworkUse = YES;
+    // 合成完毕
+    [assetExport exportAsynchronouslyWithCompletionHandler:^{
+        UISaveVideoAtPathToSavedPhotosAlbum(outPutFilePath, self, @selector(doneSaveForvideo:didFinishSavingWithError:contextInfo:), nil);
+    }];
+}
 
 - (UIImage *)addImage:(UIImage *)image1 rect:(CGRect)rect toImage:(UIImage *)image2 {
     @autoreleasepool {
@@ -417,12 +472,31 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
         UIImage *resultingImage = UIGraphicsGetImageFromCurrentImageContext();
         
         UIGraphicsEndImageContext();
-        return resultingImage;
+        
+        NSData * imageData = UIImageJPEGRepresentation(resultingImage, 0.5);
+        return [UIImage imageWithData:imageData];
     }
+}
+
+#pragma mark - AVPlayer
+-(void)addNotification{
+    //给AVPlayerItem添加播放完成通知
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playbackFinished:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.player.currentItem];
+}
+
+-(void)removeNotification{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+-(void)playbackFinished:(NSNotification *)notification{
+    NSLog(@"视频播放完成.");
+    [_player seekToTime:CMTimeMake(0, 1)];
+    [_player play];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [self.player pause];
+    [self.imgGenerator cancelAllCGImageGeneration];
     [self.timer invalidate];
 }
 
