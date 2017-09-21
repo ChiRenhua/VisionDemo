@@ -86,7 +86,7 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
         self.videoImages = splitimgs;
     }];
     
-    [self addNotification];
+//    [self addNotification];
     
 }
 
@@ -226,9 +226,8 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
 
 - (void)preHandelImage:(UIImage *)image {
     NSError *error;
-    CGImageRef imageRef = image.CGImage;
     VNDetectFaceRectanglesRequest *faceRequest = [[VNDetectFaceRectanglesRequest alloc] init];
-    VNImageRequestHandler *requestHandler = [[VNImageRequestHandler alloc] initWithCGImage:imageRef options:@{}];
+    VNImageRequestHandler *requestHandler = [[VNImageRequestHandler alloc] initWithCGImage:image.CGImage options:@{}];
     [requestHandler performRequests:@[faceRequest] error:&error];
     
     if (faceRequest.results.count) {
@@ -260,6 +259,7 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
     
     __block UIImage *handelImage = image;
     __block UIImage *hatImage = [UIImage imageNamed:@"hat"];
+    
     [results enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         VNFaceObservation *observation = (VNFaceObservation *)obj;
         CGRect oldRect = observation.boundingBox;
@@ -479,20 +479,20 @@ typedef void(^SplitCompleteBlock)(BOOL success, NSMutableArray *splitimgs);
 }
 
 #pragma mark - AVPlayer
--(void)addNotification{
-    //给AVPlayerItem添加播放完成通知
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playbackFinished:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.player.currentItem];
-}
-
--(void)removeNotification{
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
--(void)playbackFinished:(NSNotification *)notification{
-    NSLog(@"视频播放完成.");
-    [_player seekToTime:CMTimeMake(0, 1)];
-    [_player play];
-}
+//-(void)addNotification{
+//    //给AVPlayerItem添加播放完成通知
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playbackFinished:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.player.currentItem];
+//}
+//
+//-(void)removeNotification{
+//    [[NSNotificationCenter defaultCenter] removeObserver:self];
+//}
+//
+//-(void)playbackFinished:(NSNotification *)notification{
+//    NSLog(@"视频播放完成.");
+//    [_player seekToTime:CMTimeMake(0, 1)];
+//    [_player play];
+//}
 
 - (void)viewWillDisappear:(BOOL)animated {
     [self.player pause];
